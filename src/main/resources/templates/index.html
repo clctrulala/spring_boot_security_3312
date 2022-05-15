@@ -5,7 +5,12 @@
 </head>
 <body>
 <h1>Welcome to Index PAGE!</h1>
-
-
+<p/>
+<a href="/login" th:if="${user == null ? true : false }">Log in</a>
+<div th:if="${user}">
+    <a href="/logout">Log out</a></br>
+    <a href="/user">User info</a></br>
+    <a href="/admin" th:if="${admin_panel}">Admin panel</a></br>
+</div>
 </body>
 </html>
