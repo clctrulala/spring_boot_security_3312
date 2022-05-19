@@ -4,29 +4,32 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import spring.boot_security.demo.model.User;
 import spring.boot_security.demo.repository.UserDao;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 public class UserDetailsServiceImpl implements UserDetailsService, UserService {
     private final UserDao userDao;
+    private final PasswordEncoder passwordEncoder;
 
     @Autowired
-    public UserDetailsServiceImpl(UserDao userDao) {
+    public UserDetailsServiceImpl(UserDao userDao, PasswordEncoder passwordEncoder) {
+        this.passwordEncoder = passwordEncoder;
         this.userDao = userDao;
     }
 
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
-        UserDetails user = userDao.findByName(username);
+        UserDetails user = userDao.findByEmail(username);
 
         if(null == user) {
-            throw  new UsernameNotFoundException("User not found in database");
+            throw new UsernameNotFoundException("User not found in database");
         }
-
         return user;
     }
     @Override
@@ -36,27 +39,27 @@ public class UserDetailsServiceImpl implements UserDetailsService, UserService {
 
     @Override
     public List<User> getUsers() {
-        return userDao.findAll();
+        List<User> users = userDao.findAll();
+
+        return users.stream()
+                .peek(user -> user.setPassword(""))
+                .collect(Collectors.toList());
     }
 
     @Override
-    public boolean updateUser(User user) {
-        User old = getUser(user.getId());
-        if ( null != old ) {
-            user.setPassword( old.getPassword() );
-            userDao.save(user);
-            return true;
+    public void updateUser(User user) {
+        if (null != user.getPassword()) {
+            user.setPassword(passwordEncoder.encode(user.getPassword()));
         }
-        return false;
+        if(null != user.getId()) {
+            if( null == user.getPassword()) { user.setPassword(getUser(user.getId()).getPassword()); }
+        }
+        userDao.save(user);
     }
 
     @Override
-    public boolean deleteUser(long id) {
-        if ( userDao.existsById(id) ) {
-            userDao.deleteById(id);
-            return true;
-        }
-        return false;
+    public void deleteUser(long id) {
+        userDao.deleteById(id);
     }
 
     @Override

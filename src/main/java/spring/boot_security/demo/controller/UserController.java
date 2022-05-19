@@ -23,24 +23,9 @@ public class UserController {
 		this.userService = userService;
 	}
 
-	@GetMapping("{id}")
-	public String getUser(@PathVariable Long id, ModelMap model, Authentication auth) {
-		if(auth.getAuthorities().contains(Role.ADMIN.giveAuthority())) {
-			model.addAttribute("admin_panel",true);
-			model.addAttribute("user", userService.getUser(id));
-		} else {
-			getUser(model, auth);
-		}
-		return "user";
-	}
-
 	@GetMapping
 	public String getUser(ModelMap model, Authentication auth) {
-
-		if(auth.getAuthorities().contains(Role.ADMIN.giveAuthority())) {
-			model.addAttribute("admin_panel",true);
-		}
-		model.addAttribute("user", detailsService.loadUserByUsername(auth.getName()));
-		return "user";
+		model.addAttribute("admin", detailsService.loadUserByUsername(auth.getName()));
+		return "user_list";
 	}
 }

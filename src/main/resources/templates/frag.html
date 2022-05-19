@@ -1,0 +1,9 @@
+<div class="form-group" th:fragment="frag (frag_name, frag_id, frag_text)">
+  <label class="font-weight-bold  m-0" th:for="frag_id" th:text="${frag_text}">First name</label>
+  <input type="email" class="form-control" th:id="${frag_id}" th:name="${frag_name}" placeholder="">
+</div>
+
+<div class="form-group" th:fragment="disoption (frag_name, frag_id, frag_text)">
+  <label class="font-weight-bold  m-0" th:for="frag_id" th:text="${frag_text}">First name</label>
+  <input type="email" class="form-control" th:id="${frag_id}" th:name="${frag_name}" placeholder="" disabled>
+</div>

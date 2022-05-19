@@ -1,8 +1,8 @@
 package spring.boot_security.demo.controller;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.format.annotation.DateTimeFormat;
-import org.springframework.format.annotation.NumberFormat;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.ModelMap;
@@ -12,11 +12,11 @@ import org.springframework.web.bind.annotation.RequestParam;
 import spring.boot_security.demo.model.User;
 import spring.boot_security.demo.service.UserService;
 import spring.boot_security.demo.util.ControllerResponseMessage;
-import spring.boot_security.demo.util.Gender;
 import spring.boot_security.demo.util.Role;
 
+import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Date;
+import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -25,44 +25,33 @@ import java.util.stream.Collectors;
 public class AdminController {
 
     private final UserService userService;
+    private final UserDetailsService detailsService;
     private final PasswordEncoder passwordEncoder;
 
     @Autowired
-    public AdminController(UserService userService, PasswordEncoder passwordEncoder) {
+    public AdminController(UserService userService, UserDetailsService detailsService, PasswordEncoder passwordEncoder) {
         this.userService = userService;
+        this.detailsService = detailsService;
         this.passwordEncoder = passwordEncoder;
     }
 
     @GetMapping
-    public String getUsers(ModelMap model) {
+    public String getUsers(ModelMap model, Authentication auth) {
         model.addAttribute("users", userService.getUsers());
-        model.addAttribute("permits", Arrays.stream(Role.values()).collect(Collectors.toSet()));
-        return "persons";
+        model.addAttribute("permits", Arrays.stream(Role.values()).map(x -> x.name()).collect(Collectors.toList()));
+        model.addAttribute("admin", detailsService.loadUserByUsername(auth.getName()));
+        return "user_list";
     }
 
-    @GetMapping(value = "add", params = {"name!=", "birthdate!=", "gender!=", "phone!=", "password!=", "role!="})
-    public String addUser(String name, @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) Date birthdate, Gender gender, @NumberFormat(pattern="7[0-9]{10}") Long phone, String password, @RequestParam Set<Role> role, ModelMap model, ControllerResponseMessage responseMessage) {
-        User user = new User(name, birthdate, gender, phone, passwordEncoder.encode(password), role);
-        responseMessage.setModel(model)
-                .setMessages("New user added", "User append failed")
-                .selectMessage(userService.addUser(user));
-        return getUsers(model);
-    }
-
-    @GetMapping(value = "update", params = {"id!=", "name!=", "birthdate!=", "gender!=", "phone!=", "role!="})
-    public String updateUser(Long id, String name, @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) Date birthdate, Gender gender, @NumberFormat(pattern="7[0-9]{10}") Long phone, @RequestParam Set<Role> role, ModelMap model, ControllerResponseMessage responseMessage) {
-        User user = new User(id, name, birthdate, gender, phone, passwordEncoder.encode( "password"), role);
-        responseMessage.setModel(model)
-                .setMessages("User updated", "User not updated")
-                .selectMessage(userService.updateUser(user));
-        return getUsers(model);
+    @GetMapping(value = "update", params = {"first_name!=", "last_name!=", "age!=", "email!=", "role!="})
+    public String updateUser(@RequestParam(required = false) Long id, String firstName, String lastName, byte age, String email, @RequestParam(required = false) String password, @RequestParam Set<Role> role, ModelMap model, Authentication auth) {
+        userService.updateUser(new User(id, firstName, lastName, age, email, password, role));
+        return getUsers(model, auth);
     }
 
     @GetMapping("delete")
-    public String removeUser(long id, ModelMap model, ControllerResponseMessage responseMessage) {
-        responseMessage.setModel(model)
-                .setMessages("User deleted", "User not found")
-                .selectMessage(userService.deleteUser(id));
-        return getUsers(model);
+    public String removeUser(long id, ModelMap model, Authentication auth) {
+        userService.deleteUser(id);
+        return getUsers(model, auth);
     }
 }

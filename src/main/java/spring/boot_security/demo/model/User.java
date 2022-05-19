@@ -20,19 +20,17 @@ public class User implements UserDetails {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long Id;
 
-    @Column
-    private String name;
+    @Column(name = "first_name")
+    private String firstName;
+
+    @Column(name = "last_name")
+    private String lastName;
 
     @Column
-    @Temporal(TemporalType.DATE)
-    private Date birthdate;
+    private byte age;
 
     @Column
-    @Enumerated(EnumType.ORDINAL)
-    private Gender gender;
-
-    @Column
-    private Long phone;
+    private String email;
 
     private String password;
 
@@ -41,21 +39,21 @@ public class User implements UserDetails {
 
     public User() {}
 
-    public User(String name, Date birthdate, Gender gender, Long phone, String password, Set<Role> roles) {
-        this.name = name;
-        this.birthdate = birthdate;
-        this.gender = gender;
-        this.phone = phone;
+    public User(String firstName, String lastName, byte age, String email, String password, Set<Role> roles) {
+        this.firstName = firstName;
+        this.lastName = lastName;
+        this.age = age;
+        this.email = email;
         this.password = password;
         this.roles = roles;
     }
 
-    public User(Long id, String name, Date birthdate, Gender gender, Long phone, String password, Set<Role> roles) {
-        this.Id = id;
-        this.name = name;
-        this.birthdate = birthdate;
-        this.gender = gender;
-        this.phone = phone;
+    public User(Long id, String firstName, String lastName, byte age, String email, String password, Set<Role> roles) {
+        Id = id;
+        this.firstName = firstName;
+        this.lastName = lastName;
+        this.age = age;
+        this.email = email;
         this.password = password;
         this.roles = roles;
     }
@@ -68,36 +66,36 @@ public class User implements UserDetails {
         Id = id;
     }
 
-    public String getName() {
-        return name;
+    public String getFirstName() {
+        return firstName;
     }
 
-    public void setName(String name) {
-        this.name = name;
+    public void setFirstName(String firstName) {
+        this.firstName = firstName;
     }
 
-    public Date getBirthdate() {
-        return birthdate;
+    public String getLastName() {
+        return lastName;
     }
 
-    public void setBirthdate(Date birthdate) {
-        this.birthdate = birthdate;
+    public void setLastName(String lastName) {
+        this.lastName = lastName;
     }
 
-    public Gender getGender() {
-        return gender;
+    public byte getAge() {
+        return age;
     }
 
-    public void setGender(Gender gender) {
-        this.gender = gender;
+    public void setAge(byte age) {
+        this.age = age;
     }
 
-    public Long getPhone() {
-        return phone;
+    public String getEmail() {
+        return email;
     }
 
-    public void setPhone(Long phone) {
-        this.phone = phone;
+    public void setEmail(String email) {
+        this.email = email;
     }
 
     public void setPassword(String password) {
@@ -126,7 +124,7 @@ public class User implements UserDetails {
 
     @Override
     public String getUsername() {
-        return getName();
+        return getEmail();
     }
 
     @Override
