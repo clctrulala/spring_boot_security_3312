@@ -14,4 +14,5 @@ public enum Role implements GrantedAuthority {
     public GrantedAuthority giveAuthority() {
         return new SimpleGrantedAuthority(this.name());
     }
+
 }
