@@ -2,12 +2,15 @@ package spring.boot_security.demo.controller;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.ModelMap;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
+import spring.boot_security.demo.model.User;
 import spring.boot_security.demo.service.UserService;
 import spring.boot_security.demo.util.Role;
 
@@ -25,7 +28,12 @@ public class UserController {
 
 	@GetMapping
 	public String getUser(ModelMap model, Authentication auth) {
-		model.addAttribute("admin", detailsService.loadUserByUsername(auth.getName()));
+		UserDetails userDetails = detailsService.loadUserByUsername( auth.getName());
+
+		if(userDetails.getAuthorities().contains(new SimpleGrantedAuthority(Role.ADMIN.name()))){
+			model.addAttribute("comeback", true);
+		}
+		model.addAttribute("another", userDetails);
 		return "user_list";
 	}
 }

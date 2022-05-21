@@ -39,7 +39,8 @@ public class AdminController {
     public String getUsers(ModelMap model, Authentication auth) {
         model.addAttribute("users", userService.getUsers());
         model.addAttribute("permits", Arrays.stream(Role.values()).map(x -> x.name()).collect(Collectors.toList()));
-        model.addAttribute("admin", detailsService.loadUserByUsername(auth.getName()));
+        model.addAttribute("another", detailsService.loadUserByUsername(auth.getName()));
+        model.addAttribute("admin", true);
         return "user_list";
     }
 
