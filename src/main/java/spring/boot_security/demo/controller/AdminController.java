@@ -7,6 +7,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.ModelMap;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import spring.boot_security.demo.model.User;
@@ -44,14 +45,14 @@ public class AdminController {
         return "user_list";
     }
 
-    @GetMapping(value = "update", params = {"first_name!=", "last_name!=", "age!=", "email!=", "role!="})
-    public String updateUser(@RequestParam(required = false) Long id, String firstName, String lastName, byte age, String email, @RequestParam(required = false) String password, @RequestParam Set<Role> role, ModelMap model, Authentication auth) {
+    @GetMapping(value = "update", params = {"first!=", "last!=", "age!=", "email!=", "role!="})
+    public String updateUser(@RequestParam(required = false) Long id, @RequestParam("first") String firstName, @RequestParam("last") String lastName, byte age, String email, @RequestParam(required = false) String password, @RequestParam Set<Role> role, ModelMap model, Authentication auth) {
         userService.updateUser(new User(id, firstName, lastName, age, email, password, role));
         return getUsers(model, auth);
     }
 
-    @GetMapping("delete")
-    public String removeUser(long id, ModelMap model, Authentication auth) {
+    @GetMapping("delete/{id}")
+    public String removeUser(@PathVariable long id, ModelMap model, Authentication auth) {
         userService.deleteUser(id);
         return getUsers(model, auth);
     }

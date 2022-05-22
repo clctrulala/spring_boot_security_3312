@@ -10,6 +10,7 @@ import spring.boot_security.demo.model.User;
 import spring.boot_security.demo.repository.UserDao;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
@@ -48,13 +49,23 @@ public class UserDetailsServiceImpl implements UserDetailsService, UserService {
 
     @Override
     public void updateUser(User user) {
-        if (null != user.getPassword()) {
-            user.setPassword(passwordEncoder.encode(user.getPassword()));
+        Optional<String> password = Optional.of(user.getPassword());
+
+        if (password.isPresent()) {
+            if(password.get().isEmpty()) {
+                password = Optional.empty();
+            } else {
+                user.setPassword(passwordEncoder.encode(password.get()));
+            }
         }
-        if(null != user.getId()) {
-            if( null == user.getPassword()) { user.setPassword(getUser(user.getId()).getPassword()); }
+
+        if(null != user.getId() && password.isEmpty()) {
+            user.setPassword(getUser(user.getId()).getPassword());
         }
-        userDao.save(user);
+
+        if(null != user.getPassword()){
+            userDao.save(user);
+        }
     }
 
     @Override

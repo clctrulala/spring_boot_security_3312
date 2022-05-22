@@ -8,7 +8,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import spring.boot_security.demo.util.Role;
 
 @Controller
-@RequestMapping("/")
+@RequestMapping("/hgnkgykyku")
 public class NonameController {
 
     @GetMapping

@@ -47,16 +47,24 @@
         </div>
 
         <div class="col-10 bg-light vh-100">
-            <h1>User information-page</h1>
-            <nav>
-                <div class="nav nav-tabs" id="tabs">
-                    <a class="nav-item nav-link active" id="tab_profile" data-toggle="tab" href="#profile_id">User table</a>
-                    <a class="nav-item nav-link" id="tab_crud" data-toggle="tab" href="#crud_id">New user</a>
+            <h1 th:if="${admin}">Admin panel</h1>
+            <h1 th:unless="${admin}">User information-page</h1>
+            <th:block th:if="${admin}">
+                <nav>
+                    <div class="nav nav-tabs" id="tabs">
+                        <a class="nav-item nav-link active" id="tab_profile" data-toggle="tab" href="#profile_id">User table</a>
+                        <a class="nav-item nav-link" id="tab_crud" data-toggle="tab" href="#crud_id">New user</a>
+                    </div>
+                </nav>
+                <div class="tab-content bg-light border" id="interface_content_id">
+                    <th:block th:replace="frag::user_list"></th:block>
                 </div>
-            </nav>
-            <div class="tab-content bg-light border" id="interface_content_id">
-                <th:block th:replace="frag::user_list"></th:block>
-            </div>
+            </th:block>
+            <th:block th:unless="${admin}">
+                <div class="tab-content bg-light border">
+                    <th:block th:replace="frag::about_user"></th:block>
+                </div>
+            </th:block>
         </div>
     </div>
 </div>
@@ -92,7 +100,9 @@
 
 </body>
 
-<th:block th:if="${admin}" th:replace="admin_script::script"></th:block>
+<th:block th:if="${admin}">
+    <th:block th:replace="admin_script::script"></th:block>
+</th:block>
 
 </html>
 

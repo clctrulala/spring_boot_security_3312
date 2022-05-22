@@ -14,6 +14,8 @@ import spring.boot_security.demo.model.User;
 import spring.boot_security.demo.service.UserService;
 import spring.boot_security.demo.util.Role;
 
+import java.util.List;
+
 @Controller
 @RequestMapping("/user")
 public class UserController {
@@ -34,6 +36,7 @@ public class UserController {
 			model.addAttribute("comeback", true);
 		}
 		model.addAttribute("another", userDetails);
+		model.addAttribute("users", List.of(userDetails));
 		return "user_list";
 	}
 }
