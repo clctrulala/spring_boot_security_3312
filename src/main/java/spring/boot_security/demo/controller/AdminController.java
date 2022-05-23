@@ -12,12 +12,9 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import spring.boot_security.demo.model.User;
 import spring.boot_security.demo.service.UserService;
-import spring.boot_security.demo.util.ControllerResponseMessage;
 import spring.boot_security.demo.util.Role;
 
-import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -39,7 +36,7 @@ public class AdminController {
     @GetMapping
     public String getUsers(ModelMap model, Authentication auth) {
         model.addAttribute("users", userService.getUsers());
-        model.addAttribute("permits", Arrays.stream(Role.values()).map(x -> x.name()).collect(Collectors.toList()));
+        model.addAttribute("permits", Arrays.stream(Role.values()).map(Role::name).collect(Collectors.toList()));
         model.addAttribute("another", detailsService.loadUserByUsername(auth.getName()));
         model.addAttribute("admin", true);
         return "user_list";
