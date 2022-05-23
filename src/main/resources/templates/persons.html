@@ -51,8 +51,8 @@
                 <table align="center">
                     <tr th:each="permit : ${permits}">
                         <div align="right">
-                            <label for="role_id" th:text="${permit.name()}"></label>
-                            <input id="role_id" type="checkbox" th:value="${permit.name()}" name="role" th:checked="${#lists.contains(user.roles, permit)}"/>
+                            <label for="role_id" th:text="${permit.name}"></label>
+                            <input id="role_id" type="checkbox" th:value="${permit.name}" name="role" th:checked="${#lists.contains(user.roles, permit)}"/>
                         </div>
                     </tr>
                 </table>

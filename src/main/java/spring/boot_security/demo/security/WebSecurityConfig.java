@@ -1,4 +1,4 @@
-package spring.boot_security.demo.configs;
+package spring.boot_security.demo.security;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -7,6 +7,7 @@ import org.springframework.security.config.annotation.web.configuration.EnableWe
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import spring.boot_security.demo.model.Role;
 
 @Configuration
 @EnableWebSecurity
@@ -22,8 +23,8 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
         http
                 .authorizeRequests()
                 .antMatchers("/", "/index").permitAll()
-                .antMatchers("/user").hasAnyAuthority("USER", "ADMIN")
-                .antMatchers("/admin/**", "/user/**").hasAnyAuthority("ADMIN")
+                .antMatchers("/user").hasAnyAuthority(Role.USER, Role.ADMIN)
+                .antMatchers("/admin/**", "/user/**").hasAnyAuthority(Role.ADMIN)
                 .anyRequest().authenticated()
                 .and()
                 .formLogin().successHandler(successUserHandler)

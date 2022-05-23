@@ -5,6 +5,7 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import spring.boot_security.demo.model.User;
 import spring.boot_security.demo.repository.UserDao;
 
@@ -26,40 +27,38 @@ public class UserDetailsServiceImpl implements UserDetailsService, UserService {
         if(null == user) {
             throw  new UsernameNotFoundException("User not found in database");
         }
-
         return user;
     }
     @Override
-    public boolean addUser(User user) {
-        return null != userDao.save(user);
+    @Transactional
+    public void addUser(User user) {
+        userDao.save(user);
     }
 
     @Override
+    @Transactional
     public List<User> getUsers() {
-        return userDao.findAll();
+        return userDao.findUsers();
     }
 
     @Override
-    public boolean updateUser(User user) {
+    @Transactional
+    public void updateUser(User user) {
         User old = getUser(user.getId());
-        if ( null != old ) {
+        if (null != old) {
             user.setPassword( old.getPassword() );
             userDao.save(user);
-            return true;
         }
-        return false;
     }
 
     @Override
-    public boolean deleteUser(long id) {
-        if ( userDao.existsById(id) ) {
-            userDao.deleteById(id);
-            return true;
-        }
-        return false;
+    @Transactional
+    public void deleteUser(long id) {
+        if(userDao.existsById(id)) { userDao.deleteById(id); }
     }
 
     @Override
+    @Transactional
     public User getUser(Long id) {
         return userDao.findById(id).orElse(null);
     }

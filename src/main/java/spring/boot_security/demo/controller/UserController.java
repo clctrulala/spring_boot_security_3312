@@ -8,8 +8,8 @@ import org.springframework.ui.ModelMap;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
+import spring.boot_security.demo.model.Role;
 import spring.boot_security.demo.service.UserService;
-import spring.boot_security.demo.util.Role;
 
 @Controller
 @RequestMapping("/user")
@@ -25,7 +25,7 @@ public class UserController {
 
 	@GetMapping("{id}")
 	public String getUser(@PathVariable Long id, ModelMap model, Authentication auth) {
-		if(auth.getAuthorities().contains(Role.ADMIN.giveAuthority())) {
+		if(auth.getAuthorities().contains(new Role(Role.ADMIN))) {
 			model.addAttribute("admin_panel",true);
 			model.addAttribute("user", userService.getUser(id));
 		} else {
@@ -36,8 +36,7 @@ public class UserController {
 
 	@GetMapping
 	public String getUser(ModelMap model, Authentication auth) {
-
-		if(auth.getAuthorities().contains(Role.ADMIN.giveAuthority())) {
+		if(auth.getAuthorities().contains(new Role(Role.ADMIN))) {
 			model.addAttribute("admin_panel",true);
 		}
 		model.addAttribute("user", detailsService.loadUserByUsername(auth.getName()));
