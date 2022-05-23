@@ -8,10 +8,7 @@ import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.ModelMap;
 import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
-import spring.boot_security.demo.model.User;
-import spring.boot_security.demo.service.UserService;
 import spring.boot_security.demo.util.Role;
 
 import java.util.List;
@@ -20,12 +17,10 @@ import java.util.List;
 @RequestMapping("/user")
 public class UserController {
 	private final UserDetailsService detailsService;
-	private final UserService userService;
 
 	@Autowired
-	public UserController(UserDetailsService detailsService, UserService userService) {
+	public UserController(UserDetailsService detailsService) {
 		this.detailsService = detailsService;
-		this.userService = userService;
 	}
 
 	@GetMapping

@@ -1,5 +1,6 @@
 package spring.boot_security.demo.repository;
 
+import com.sun.istack.NotNull;
 import org.springframework.data.repository.CrudRepository;
 import org.springframework.lang.NonNullApi;
 import org.springframework.stereotype.Repository;
@@ -15,7 +16,7 @@ public interface UserDao extends CrudRepository<User, Long> {
     @Override
     List<User> findAll();
 
-    Long deleteById(long Id);
+    void deleteById(long Id);
 
     User findByEmail(String name);
 }
