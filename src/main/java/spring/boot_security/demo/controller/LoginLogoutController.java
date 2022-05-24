@@ -7,14 +7,13 @@ import org.springframework.web.bind.annotation.RequestMapping;
 @Controller
 @RequestMapping("/")
 public class LoginLogoutController {
-
-    @GetMapping
+    @GetMapping("/login")
     public String login() {
         return "login";
     }
 
     @GetMapping("logout")
-    public String logout_get() {
-        return "login";
+    public String logout() {
+        return "redirect:/login";
     }
 }

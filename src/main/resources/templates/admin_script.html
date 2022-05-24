@@ -20,8 +20,8 @@ $('#modal_edit_id').on('show.bs.modal', function (event) {
 
 	// подмена адреса, смена оформления и надписи кнопки, запрет изменения
 	if( btn.text().includes(btn_name_delete) ){
-		btn_submit.attr( {formaction : `/admin/delete/${btn_value}`
-						      ,class : 'btn btn-danger' })
+		btn_submit.attr({formaction : `/admin/delete/${btn_value}`
+						     ,class : 'btn btn-danger' })
 		btn_submit.text(btn_name_delete)
 		password.attr('hidden', true)
 		hidden_group.forEach(x => $(x).attr('disabled', true))
@@ -30,7 +30,7 @@ $('#modal_edit_id').on('show.bs.modal', function (event) {
         let role_prefix = `#role_${btn_value}_`
         let count = 0;
 
-        for( let role  = $(role_prefix + count);
+        for( let role = $(role_prefix + count);
                  role.text() && count<10000;
                  role = $(role_prefix + ++count) ){
             let text = role.text().trim()
@@ -38,8 +38,8 @@ $('#modal_edit_id').on('show.bs.modal', function (event) {
         }
 
 	} else {
-		btn_submit.attr( {formaction : `/admin/update/`
-						      ,class : 'btn btn-primary' })
+		btn_submit.attr({formaction : `/admin/update/`
+						     ,class : 'btn btn-primary' })
 		btn_submit.text('Edit')
 		password.attr('hidden', null)
 		hidden_group.forEach(x => $(x).attr('disabled', null))
@@ -48,7 +48,7 @@ $('#modal_edit_id').on('show.bs.modal', function (event) {
         let permit_prefix = '#permit_'
         let count = 0;
 
-        for( let permit  = $(permit_prefix + count);
+        for( let permit = $(permit_prefix + count);
                  permit.text() && count<10000;
                  permit = $(permit_prefix + ++count) ){
             let text = permit.text().trim()

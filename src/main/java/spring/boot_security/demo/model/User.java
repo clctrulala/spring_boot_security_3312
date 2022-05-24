@@ -3,12 +3,9 @@ package spring.boot_security.demo.model;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
-import spring.boot_security.demo.util.Gender;
-import spring.boot_security.demo.util.Role;
 
 import javax.persistence.*;
 import java.util.Collection;
-import java.util.Date;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -34,7 +31,7 @@ public class User implements UserDetails {
 
     private String password;
 
-    @ElementCollection(fetch = FetchType.EAGER)
+    @OneToMany(cascade = CascadeType.ALL)
     Set<Role> roles;
 
     public User() {}
@@ -112,9 +109,7 @@ public class User implements UserDetails {
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
-        return getRoles().stream()
-                .map( role -> new SimpleGrantedAuthority(role.name()) )
-                .collect(Collectors.toSet());
+        return roles;
     }
 
     @Override

@@ -10,11 +10,10 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
+import spring.boot_security.demo.model.Role;
 import spring.boot_security.demo.model.User;
 import spring.boot_security.demo.service.UserService;
-import spring.boot_security.demo.util.Role;
 
-import java.util.Arrays;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -36,10 +35,9 @@ public class AdminController {
     @GetMapping
     public String getUsers(ModelMap model, Authentication auth) {
         model.addAttribute("users", userService.getUsers());
-        model.addAttribute("permits", Arrays.stream(Role.values()).map(Role::name).collect(Collectors.toList()));
-        model.addAttribute("another", detailsService.loadUserByUsername(auth.getName()));
-        model.addAttribute("admin", true);
-        return "user_list";
+        model.addAttribute("permits", Role.getAllRoles().stream().map(Role::getName).collect(Collectors.toSet()));
+        model.addAttribute("current_user", detailsService.loadUserByUsername(auth.getName()));
+        return "users_list";
     }
 
     @GetMapping(value = "update", params = {"first!=", "last!=", "age!=", "email!=", "role!="})
