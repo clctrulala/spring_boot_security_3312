@@ -35,16 +35,4 @@ public class AdminController {
         model.addAttribute("current_user", detailsService.loadUserByUsername(auth.getName()));
         return "admin_panel";
     }
-
-    @GetMapping(value = "update", params = {"first!=", "last!=", "age!=", "email!=", "role!="})
-    public String updateUser(@RequestParam(required = false) Long id, @RequestParam("first") String firstName, @RequestParam("last") String lastName, byte age, String email, @RequestParam(required = false) String password, @RequestParam Set<Role> role, ModelMap model, Authentication auth) {
-        userService.updateUser(new User(id, firstName, lastName, age, email, password, role));
-        return getUsers(model, auth);
-    }
-
-    @GetMapping("delete/{id}")
-    public String removeUser(@PathVariable long id, ModelMap model, Authentication auth) {
-        userService.deleteUser(id);
-        return getUsers(model, auth);
-    }
 }

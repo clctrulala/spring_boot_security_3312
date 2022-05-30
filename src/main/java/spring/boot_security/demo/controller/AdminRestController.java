@@ -25,12 +25,6 @@ public class AdminRestController {
         this.userService = userService;
     }
 
-    @GetMapping(value = "list", produces = MediaType.APPLICATION_JSON_VALUE)
-    @ResponseBody
-    public List<User> getUsers() {
-        return userService.getUsers();
-    }
-
     @PostMapping(value = "create", consumes = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity createUser(@RequestBody Optional<User> user) {
         if(user.isEmpty()){

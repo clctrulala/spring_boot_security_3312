@@ -21,10 +21,8 @@ function validateField(id, value){
 
 		if(validateField(id, field.val())){
 			$('#'+id).removeClass('custom-btn-class')
-			console.log('valid')
 		} else {
 			$('#'+id).addClass('custom-btn-class')
-			console.log('INVALID')
 		}
 	})
 })
@@ -132,12 +130,6 @@ $("#new_user").submit(function(e) {
                   ,'Content-Type': 'application/json; charset=utf-8'
                   ,'X-CSRF-TOKEN': $('#csrf').val()
                   }
-
-    console.log("New user:"); //<------------------------------------
-    for(var pair of form_data.entries()) { //<------------------------------------
-       console.log(pair[0]+ ', '+ pair[1]);
-    } //<------------------------------------
-
     const resp = fetch( $(form).attr('action'), {
                               method: 'POST'
                             ,headers: def_headers
@@ -151,7 +143,6 @@ $("#new_user").submit(function(e) {
                     user.roles.forEach((item, index, array)=>{
                         array[index]=item.name
                     })
-                    console.log(user) //<------------------------------------
                     $('#user_list').append(addRow(user))
                     return user
 			   }).catch(err=>console.log(err.message));
@@ -181,14 +172,9 @@ $("#form_edit_id").submit(function(e) {
                   ,'Content-Type': 'application/json; charset=utf-8'
                   ,'X-CSRF-TOKEN': $('#csrf').attr('value')
                   }
-
-	for(var pair of form_data.entries()) { //<------------------------------------
-	   console.log(pair[0] + ', ' + pair[1]);
-	}
-
 	const submit_obj = $(form).parents('.modal').find('button[type="submit"]')
+	const method = submit_obj.attr('formmethod')
     const resp = fetch( submit_obj.attr('formaction'), {
-                              //method: $('#modal_submit').attr('formmethod')
                               method: submit_obj.attr('formmethod')
                             ,headers: def_headers
                                ,body: data_json
@@ -196,17 +182,15 @@ $("#form_edit_id").submit(function(e) {
 					if(!response.ok){
 						throw new Error("ERROR: Request for DELETE \ EDIT user not sending")
 					}
-					console.log(response.statusText) //<------------------------------------
-					return response
+					if(method === 'PUT'){ return response.json() }
 			   }).then((response)=>{
-			        const method = submit_obj.attr('formmethod')
-
 			        if(method === 'PUT'){
-			            const user = response.json()
-
+			            let user = response
+                        console.log(user)
 			            user.roles.forEach((item, index, array)=>{
 			                array[index]=item.name
                         })
+			            console.log(user.roles)
                         $(`#row_${form_data.get('id')}`).replaceWith(changeRow(user))
 			        } else {
 			            $(`#row_${form_data.get('id')}`).remove()
@@ -243,7 +227,6 @@ $('#modal_edit_id').on('show.bs.modal', function (event) {
 
     modal_role_id.empty()
 
-	// подмена адреса, смена оформления и надписи кнопки, запрет изменения <-------------------------------------
 	if( btn.text().includes(btn_name_delete) ){
         $('#modal_caption').text('Delete user')
         hideFormState(btn_submit, password, hidden_group
@@ -254,7 +237,6 @@ $('#modal_edit_id').on('show.bs.modal', function (event) {
 		                                ,btn_style_edit, 'Edit', modal_role_id, '#permit_')
 	}
 
-    // копирование полей из основной таблицы по номеру из кнопки <-----------------------------------
     for( let name of names ){
         const source = $(`#${name}_${btn_value}`)
 		const dest = $(`#${modal_prefix}${name}`)
