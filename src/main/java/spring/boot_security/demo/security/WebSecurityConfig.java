@@ -9,6 +9,8 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import spring.boot_security.demo.model.Role;
 
+import javax.sql.DataSource;
+
 @Configuration
 @EnableWebSecurity
 public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
@@ -23,7 +25,7 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
         http
                 .authorizeRequests()
                 .antMatchers("/user").hasAnyAuthority(Role.USER, Role.ADMIN)
-                .antMatchers("/admin/**", "/user/**").hasAnyAuthority(Role.ADMIN)
+                .antMatchers("/admin/**", "/api/**").hasAnyAuthority(Role.ADMIN)
                 .antMatchers("/login").permitAll()
                 .anyRequest().authenticated()
                 .and()

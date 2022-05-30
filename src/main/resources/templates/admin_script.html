@@ -1,88 +1,266 @@
 <th:block th:fragment="script">
 
 <script type="application/javascript">
+function validateField(id, value){
+	if(!value){ return true }
+	if('firstName'===id || 'lastName'===id){
+		return (/^[\p{Alpha}]+-*[\p{Alpha}]+-*[\p{Alpha}]+$/u).test(''+value)
+	}
+	if('age'===id){
+		return value>0 && value<127
+	}
+	if('email'===id){
+		return (/^\p{Alpha}+\p{Nd}*@\p{Alpha}+\p{Nd}*\.\p{Alpha}{2,5}$/u).test(''+value)
+	}
+}
+
+['firstName', 'lastName', 'age', 'email'].forEach(id=>{
+	$('#'+id).on('blur', e=>{
+		const field = $(e.currentTarget)
+		const id = field.attr('id')
+
+		if(validateField(id, field.val())){
+			$('#'+id).removeClass('custom-btn-class')
+			console.log('valid')
+		} else {
+			$('#'+id).addClass('custom-btn-class')
+			console.log('INVALID')
+		}
+	})
+})
+
+function copyRoles(dest, prefix){
+    let count = 0;
+
+	for( let role = $(prefix + count);
+			 role.text() && count<10000;
+			 role = $(prefix + ++count) ){
+		const text = role.text().trim()
+		dest.append( new Option(text, text) )
+	}
+}
+
+function getRoles(prefix){
+    let count = 0
+	let roles = ''
+
+    for( let role = $(prefix + count);
+			 role.text() && count<10000;
+			 role = $(prefix + ++count) ){
+		roles += ' ' + role.text().trim()
+	}
+	return roles.trim()
+}
+
+function changeFormState(button_obj, password_obj, group, button_attributes
+                        ,button_text, hide_password, disable_fields, dest, prefix){
+    button_obj.attr(button_attributes)
+    button_obj.text(button_text)
+    password_obj.attr('hidden', hide_password)
+    group.forEach(x => $(x).attr('disabled', disable_fields))
+    copyRoles(dest, prefix)
+}
+
+function showFormState(button_obj, password_obj, group, button_attributes, button_text, dest, prefix){
+    changeFormState(button_obj, password_obj, group, button_attributes, button_text, null, null, dest, prefix)
+}
+
+function hideFormState(button_obj, password_obj, group, button_attributes, button_text, dest, prefix){
+    changeFormState(button_obj, password_obj, group, button_attributes, button_text, true, true, dest, prefix)
+}
+
+function addButton(user_id, is_danger_type){
+	const btype = {class_type: is_danger_type ? 'btn-danger': 'btn-info'
+					  ,name: is_danger_type ? 'Delete': 'Edit'}
+	const str = `<td><button type="button" id="${btype.name.toLowerCase()}_${user_id}" value="${user_id}"
+	                class="btn ${btype.class_type}" data-toggle="modal"
+	                data-target="#modal_edit_id">${btype.name}</button></td>`
+
+	return str
+};
+
+function addCell(field_name, user_id, cell_text, is_header){
+	const cell_type = is_header ? 'th' : 'td'
+	const str = `<${cell_type} id="${field_name}_${user_id}">${cell_text}</${cell_type}>`
+
+	return str
+};
+
+function addRow(user){
+	let roles = ''
+	let row = ''
+	const btn_edit = addButton(user.id)
+	const btn_delete = addButton(user.id, true)
+
+	user.roles.forEach((role, i)=>{
+		roles += `<label class="pl-2" id="role_${+user.id}_${i}">${role}</label>`
+	})
+
+	const cells = [
+                    ['id', user.id, user.id, true]
+                   ,['firstName', user.id, user.firstName]
+                   ,['lastName', user.id, user.lastName]
+                   ,['age', user.id, user.age]
+                   ,['email', user.id, user.email]
+                   ,['roles', user.id, roles]
+                  ]
+
+	cells.forEach((cell)=>{
+		row += addCell(cell[0], cell[1], cell[2], cell[3])
+	})
+
+	return `<tr id="row_${user.id}">` + row + btn_edit + btn_delete + '</tr>'
+};
+
+function changeRow(user){
+	user.password = ''
+	return addRow(user)
+}
+
+$("#new_user").submit(function(e) {
+    e.preventDefault();
+
+    const form = e.currentTarget
+	const url = form.action;
+	const form_data = new FormData(form);
+	const roles = JSON.stringify(form_data.getAll('roles'))
+
+	form_data.delete('roles')
+
+	const data_json = JSON.stringify(Object.fromEntries(form_data.entries())).replace(/}$/, ',"roles":'+roles+'}');
+	const def_headers = {'Accept': 'application/json'
+                  ,'Content-Type': 'application/json; charset=utf-8'
+                  ,'X-CSRF-TOKEN': $('#csrf').val()
+                  }
+
+    console.log("New user:"); //<------------------------------------
+    for(var pair of form_data.entries()) { //<------------------------------------
+       console.log(pair[0]+ ', '+ pair[1]);
+    } //<------------------------------------
+
+    const resp = fetch( $(form).attr('action'), {
+                              method: 'POST'
+                            ,headers: def_headers
+                               ,body: data_json
+			   }).then(response => {
+					if(!response.ok){
+						throw new Error("ERROR: Bad request for NEW user.")
+					}
+					return response.json()
+               }).then(user => {
+                    user.roles.forEach((item, index, array)=>{
+                        array[index]=item.name
+                    })
+                    console.log(user) //<------------------------------------
+                    $('#user_list').append(addRow(user))
+                    return user
+			   }).catch(err=>console.log(err.message));
+
+    ['firstName'
+    ,'lastName'
+    ,'age'
+    ,'email'
+    ,'add_password'
+    ].forEach(item => $(`#${item}`).val(null))
+    $('#permit_id').val(null)
+    $('#tab_profile').tab('show')
+})
+
+$("#form_edit_id").submit(function(e) {
+    e.preventDefault();
+
+	const form = e.currentTarget
+	const url = form.action;
+	const form_data = new FormData(form);
+	let roles = JSON.stringify(form_data.getAll('roles'))
+
+	form_data.delete('roles')
+
+	const data_json = JSON.stringify(Object.fromEntries(form_data.entries())).replace(/}$/, ',"roles":'+roles+'}');
+	const def_headers = {'Accept': 'application/json'
+                  ,'Content-Type': 'application/json; charset=utf-8'
+                  ,'X-CSRF-TOKEN': $('#csrf').attr('value')
+                  }
+
+	for(var pair of form_data.entries()) { //<------------------------------------
+	   console.log(pair[0] + ', ' + pair[1]);
+	}
+
+	const submit_obj = $(form).parents('.modal').find('button[type="submit"]')
+    const resp = fetch( submit_obj.attr('formaction'), {
+                              //method: $('#modal_submit').attr('formmethod')
+                              method: submit_obj.attr('formmethod')
+                            ,headers: def_headers
+                               ,body: data_json
+			   }).then(response=>{
+					if(!response.ok){
+						throw new Error("ERROR: Request for DELETE \ EDIT user not sending")
+					}
+					console.log(response.statusText) //<------------------------------------
+					return response
+			   }).then((response)=>{
+			        const method = submit_obj.attr('formmethod')
+
+			        if(method === 'PUT'){
+			            const user = response.json()
+
+			            user.roles.forEach((item, index, array)=>{
+			                array[index]=item.name
+                        })
+                        $(`#row_${form_data.get('id')}`).replaceWith(changeRow(user))
+			        } else {
+			            $(`#row_${form_data.get('id')}`).remove()
+			        }
+			   }).catch(err=>console.log(err.message));
+   $(form).parents('.modal').modal('hide')
+});
+
 $('#modal_edit_id').on('show.bs.modal', function (event) {
-    let modal = $(this)
-    let btn = $(event.relatedTarget)
-    let btn_value = btn.prop('value')
-	let btn_submit = $('#modal_submit')
-	let modal_role_id = $('#modal_role_id')
-	let password = $('#group_modal_password')
-	let btn_name_delete = 'Delete'
-	let hidden_group = ['#modal_first'
-	                   ,'#modal_last'
-	                   ,'#modal_age'
-					   ,'#modal_email'
-					   ,'#modal_password'
-					   ,'#modal_role_id']
+    const modal = $(this)
+    const btn = $(event.relatedTarget)
+    const btn_value = btn.prop('value')
+	const btn_submit = $('#modal_submit')
+	const modal_role_id = $('#modal_role_id')
+	const password = $('#group_modal_password')
+	const btn_name_delete = 'Delete'
+	const modal_prefix = 'modal_'
+	const role_prefix = `#role_${btn_value}_`
+    const names = ['id', 'firstName', 'lastName', 'age', 'email', 'password']
+	const hidden_group = [`#${modal_prefix}${names[1]}`
+                         ,`#${modal_prefix}${names[2]}`
+                         ,`#${modal_prefix}${names[3]}`
+                         ,`#${modal_prefix}${names[4]}`
+                         ,`#${modal_prefix}${names[5]}`
+                         ,'#modal_role_id'
+                         ]
+    const btn_style_delete = {formaction : `/api/delete/`
+						          ,class : 'btn btn-danger'
+						      ,formmethod: 'DELETE'}
+    const btn_style_edit = {formaction : `/api/update`
+						        ,class : 'btn btn-primary'
+						    ,formmethod: 'PUT'
+						    }
 
     modal_role_id.empty()
 
-	// подмена адреса, смена оформления и надписи кнопки, запрет изменения
+	// подмена адреса, смена оформления и надписи кнопки, запрет изменения <-------------------------------------
 	if( btn.text().includes(btn_name_delete) ){
-		btn_submit.attr({formaction : `/admin/delete/${btn_value}`
-						     ,class : 'btn btn-danger' })
-		btn_submit.text(btn_name_delete)
-		password.attr('hidden', true)
-		hidden_group.forEach(x => $(x).attr('disabled', true))
-
-        // очистка и копирование ролей для текущего действия
-        let role_prefix = `#role_${btn_value}_`
-        let count = 0;
-
-        for( let role = $(role_prefix + count);
-                 role.text() && count<10000;
-                 role = $(role_prefix + ++count) ){
-            let text = role.text().trim()
-            modal_role_id.append( new Option(text, text) )
-        }
-
+        $('#modal_caption').text('Delete user')
+        hideFormState(btn_submit, password, hidden_group
+                                        ,btn_style_delete ,btn_name_delete, modal_role_id, role_prefix)
 	} else {
-		btn_submit.attr({formaction : `/admin/update/`
-						     ,class : 'btn btn-primary' })
-		btn_submit.text('Edit')
-		password.attr('hidden', null)
-		hidden_group.forEach(x => $(x).attr('disabled', null))
-
-		// очистка и копирование ролей для текущего действия
-        let permit_prefix = '#permit_'
-        let count = 0;
-
-        for( let permit = $(permit_prefix + count);
-                 permit.text() && count<10000;
-                 permit = $(permit_prefix + ++count) ){
-            let text = permit.text().trim()
-            modal_role_id.append( new Option(text, text) )
-        }
+		$('#modal_caption').text('Edit user')
+		showFormState(btn_submit, password, hidden_group
+		                                ,btn_style_edit, 'Edit', modal_role_id, '#permit_')
 	}
 
-    // копирование полей из основной таблицы по номеру из кнопки
-    let names = ['id', 'first', 'last', 'age', 'email', 'password']
-    let modal_prefix = 'modal_'
-
+    // копирование полей из основной таблицы по номеру из кнопки <-----------------------------------
     for( let name of names ){
-        let source = $(`#${name}_${btn_value}`)
-		let dest = $(`#${modal_prefix}${name}`)
+        const source = $(`#${name}_${btn_value}`)
+		const dest = $(`#${modal_prefix}${name}`)
 
-        if(source && dest){
-			dest.attr( 'value', source.text() )
-        }
+        if(source && dest) { dest.attr( 'value', source.text() ) };
     }
-/*
-    // очистка и копирование ролей для текущего действия
-    let modal_role_id = $('#modal_role_id')
-	let role_prefix = `#role_${btn_value}_`
-	let count = 0;
-
-	modal_role_id.empty()
-
-    for( let role  = $(role_prefix + count);
-			 role.text() && count<10000;
-			 role = $(role_prefix + ++count) ){
-        let text = role.text().trim()
-		modal_role_id.append( new Option(text, text) )
-    }
-*/
 })
 </script>
 

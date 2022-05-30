@@ -21,25 +21,19 @@
 </div>
 
 <th:block th:fragment="common_parameters_block (common_first_id, common_last_id, common_age_id, common_email_id)">
-  <div th:replace="frag::user_parameter('first', ${common_first_id}, 'text', 'First name', 'false')"></div>
-  <div th:replace="frag::user_parameter('last', ${common_last_id}, 'text', 'Last name', 'false')"></div>
+  <div th:replace="frag::user_parameter('firstName', ${common_first_id}, 'text', 'First name', 'false')"></div>
+  <div th:replace="frag::user_parameter('lastName', ${common_last_id}, 'text', 'Last name', 'false')"></div>
   <div th:replace="frag::user_parameter('age', ${common_age_id}, 'number', 'Age', 'false')"></div>
   <div th:replace="frag::user_parameter('email', ${common_email_id}, 'email', 'Email', 'false')"></div>
 </th:block>
 
-<th:block th:fragment="edit_block (edit_id_id, edit_first_id, edit_last_id, edit_age_id, edit_email_id, edit_password_id)">
-  <div th:replace="frag::user_parameter('id', ${edit_id_id}, 'text', 'ID', 'true')"></div>
-  <div th:replace="frag::common_parameters_block(${edit_first_id}, ${edit_last_id}, ${edit_age_id}, ${edit_email_id})"></div>
-  <div th:replace="frag::user_parameter('password', ${edit_password_id}, 'password', 'Password', 'false')"></div>
-</th:block>
-
 <th:block th:fragment="users_list_block">
   <th th:attr="id=${'id_'+user.id}" scope="row" th:text="${user.id}">0</th>
-  <td th:attr="id=${'first_'+user.id}" th:text="${user.firstName}">First</td>
-  <td th:attr="id=${'last_'+user.id}" th:text="${user.lastName}">Last</td>
+  <td th:attr="id=${'firstName_'+user.id}" th:text="${user.firstName}">First</td>
+  <td th:attr="id=${'lastName_'+user.id}" th:text="${user.lastName}">Last</td>
   <td th:attr="id=${'age_'+user.id}" th:text="${user.age}">21</td>
   <td th:attr="id=${'email_'+user.id}" th:text="${user.email}">name@mail.com</td>
-  <td id="user_list_roles">
+  <td>
     <th:block th:each="role, stat : ${user.roles}">
       <label class="pl-2" th:id="${'role_'+user.id+'_'+stat.index}" th:text="${role.name}"></label>
     </th:block>
@@ -54,25 +48,3 @@
   <th scope="col">Email</th>
   <th scope="col">Role</th>
 </th:block>
-
-<div class="tab-pane bg-white fade show active" id="about_id" th:fragment="about_user">
-  <div class="row-auto">
-    <h4 class="bg-light p-2">About user</h4>
-  </div>
-  <div class="row-auto p-4">
-    <div class="table-responsive">
-      <table class="table table-striped bg-white">
-        <thead>
-        <tr>
-          <th:block th:replace="frag::users_list_headers"></th:block>
-        </tr>
-        </thead>
-        <tbody>
-        <tr th:each="user : ${users}">
-          <th:block th:replace="frag::users_list_block"></th:block>
-        </tr>
-        </tbody>
-      </table>
-    </div>
-  </div>
-</div>

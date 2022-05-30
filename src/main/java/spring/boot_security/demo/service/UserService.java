@@ -5,9 +5,9 @@ import spring.boot_security.demo.model.User;
 import java.util.List;
 
 public interface UserService {
-    boolean addUser(User user);
+    User addUser(User user);
     List<User> getUsers();
     User getUser(Long id);
-    void updateUser(User user);
+    User updateUser(User user);
     void deleteUser(long id);
 }

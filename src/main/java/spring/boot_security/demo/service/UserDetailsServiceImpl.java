@@ -6,6 +6,8 @@ import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+import spring.boot_security.demo.model.Role;
 import spring.boot_security.demo.model.User;
 import spring.boot_security.demo.repository.UserDao;
 
@@ -25,6 +27,7 @@ public class UserDetailsServiceImpl implements UserDetailsService, UserService {
     }
 
     @Override
+    @Transactional(readOnly = true)
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
         UserDetails user = userDao.findByEmail(username);
 
@@ -34,46 +37,44 @@ public class UserDetailsServiceImpl implements UserDetailsService, UserService {
         return user;
     }
     @Override
-    public boolean addUser(User user) {
-        return null != userDao.save(user);
+    @Transactional
+    public User addUser(User user) {
+        if(null == user.getRoles() || 0 == user.getRoles().size()) {
+            return null;
+        }
+        user.setPassword(passwordEncoder.encode(user.getPassword()));
+        return userDao.save(user);
     }
 
     @Override
+    @Transactional(readOnly = true)
     public List<User> getUsers() {
-        List<User> users = userDao.findAll();
-
-        return users.stream()
-                .peek(user -> user.setPassword(""))
-                .collect(Collectors.toList());
+        return userDao.findAll().stream().peek(user -> user.setPassword("")).collect(Collectors.toList());
     }
 
     @Override
-    public void updateUser(User user) {
+    @Transactional
+    public User updateUser(User user) {
         Optional<String> password = Optional.of(user.getPassword());
+        User oldUser = getUser(user.getId());
 
-        if (password.isPresent()) {
-            if(password.get().isEmpty()) {
-                password = Optional.empty();
-            } else {
-                user.setPassword(passwordEncoder.encode(password.get()));
-            }
+        if (password.isEmpty() || password.get().isEmpty()) {
+            user.setPassword(oldUser.getPassword());
         }
-
-        if(null != user.getId() && password.isEmpty()) {
-            user.setPassword(getUser(user.getId()).getPassword());
+        if(null == user.getRoles() || 0 == user.getRoles().size()) {
+            user.setRoles(oldUser.getRoles());
         }
-
-        if(null != user.getPassword()){
-            userDao.save(user);
-        }
+        return userDao.save(user);
     }
 
     @Override
+    @Transactional
     public void deleteUser(long id) {
         userDao.deleteById(id);
     }
 
     @Override
+    @Transactional(readOnly = true)
     public User getUser(Long id) {
         return userDao.findById(id).orElse(null);
     }

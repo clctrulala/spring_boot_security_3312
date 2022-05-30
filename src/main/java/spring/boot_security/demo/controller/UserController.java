@@ -2,13 +2,12 @@ package spring.boot_security.demo.controller;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.Authentication;
-import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.ModelMap;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
-import spring.boot_security.demo.model.Role;
+import spring.boot_security.demo.model.User;
 
 import java.util.List;
 
@@ -24,13 +23,10 @@ public class UserController {
 
 	@GetMapping
 	public String getUser(ModelMap model, Authentication auth) {
-		UserDetails userDetails = detailsService.loadUserByUsername( auth.getName());
+		User user = (User)detailsService.loadUserByUsername( auth.getName());
 
-		if(userDetails.getAuthorities().contains(new Role(Role.ADMIN))){
-			model.addAttribute("comeback", true);
-		}
-		model.addAttribute("current_user", userDetails);
-		model.addAttribute("users", List.of(userDetails));
-		return "users_list";
+		model.addAttribute("current_user", user);
+		model.addAttribute("users", List.of(user));
+		return "user";
 	}
 }

@@ -1,5 +1,6 @@
 package spring.boot_security.demo.model;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import org.springframework.security.core.GrantedAuthority;
 
 import javax.persistence.*;
@@ -15,6 +16,7 @@ public class Role implements GrantedAuthority {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
     private Long id;
 
     @Column
@@ -38,13 +40,16 @@ public class Role implements GrantedAuthority {
         this.name = name;
     }
 
+    @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
     public static Set<Role> getAllRoles() { return Stream.of(ADMIN, USER).map(Role::new).collect(Collectors.toSet()); }
 
     @Override
+    @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
     public String getAuthority() {
         return this.name;
     }
 
+    @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
     public GrantedAuthority giveAuthority() {
         return this;
     }

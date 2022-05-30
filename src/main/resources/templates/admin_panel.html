@@ -1,0 +1,137 @@
+<!doctype html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.springframework.org/security/tags">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <th:block th:replace="frag::scripts"/>
+    <title>Admin panel</title>
+    <style>
+        .custom-btn-class{
+            background-color: #f0e678;
+        }
+    </style>
+</head>
+<body>
+
+<div class="container-fluid">
+    <th:block th:replace="frag::page_header"></th:block>
+
+    <th:block>
+        <div class="row">
+            <div class="col-2 p-0">
+                <div class="list-group">
+                    <th:block>
+                        <a class="list-group-item rounded-0 list-group-item-action border-0 active" href="/admin">Admin</a>
+                        <a class="list-group-item rounded-0 list-group-item-action border-0" href="/user">User</a>
+                    </th:block>
+                </div>
+            </div>
+
+            <div class="col-10 bg-light vh-100">
+                <h1>Admin panel</h1>
+                <nav>
+                    <div class="nav nav-tabs" id="tabs">
+                        <a class="nav-item nav-link active" id="tab_profile" data-toggle="tab" href="#profile_id">User table</a>
+                        <a class="nav-item nav-link" id="tab_crud" data-toggle="tab" href="#crud_id">New user</a>
+                    </div>
+                </nav>
+                <div class="tab-content bg-light border" id="interface_content_id">
+                    <div class="tab-pane bg-white fade show active" id="profile_id">
+                        <div class="row-auto">
+                            <h4 class="bg-light p-2">All users</h4>
+                        </div>
+                        <div class="row-auto p-4">
+                            <div class="table-responsive">
+                                <table class="table table-striped bg-white">
+                                    <thead>
+                                    <tr>
+                                        <th:block th:replace="frag::users_list_headers"></th:block>
+                                        <th scope="col">Edit</th>
+                                        <th scope="col">Delete</th>
+                                    </tr>
+                                    </thead>
+                                    <tbody id="user_list">
+                                        <tr th:each="user : ${users}" th:id="${'row_'+user.id}">
+                                            <th:block th:replace="frag::users_list_block"></th:block>
+                                            <td>
+                                                <button type="button" th:attr="id=${'edit_'+user.id},value=${user.id}" class="btn btn-info" data-toggle="modal" data-target="#modal_edit_id">
+                                                    Edit
+                                                </button>
+                                            </td>
+                                            <td>
+                                                <button type="button" th:attr="id=${'delete_'+user.id},value=${user.id}" class="btn btn-danger" data-toggle="modal" data-target="#modal_edit_id">
+                                                    Delete
+                                                </button>
+                                            </td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="tab-pane fade" id="crud_id">
+                        <div class="row-auto">
+                            <h4 class="bg-light p-2">Add new user</h4>
+                        </div>
+                        <div class="row-auto bg-white">
+                            <div class="col-4 offset-4">
+                                <form class="p-4 text-center" id="new_user" method="post" action="/api/create">
+                                    <div th:replace="frag::common_parameters_block('firstName', 'lastName', 'age', 'email')"></div>
+                                    <div th:replace="frag::user_parameter('password', 'add_password', 'password', 'Password', 'false')"></div>
+                                    <div class="form-group">
+                                        <label class="font-weight-bold m-0" for="permit_id">Role</label>
+                                        <select class="custom-select" id="permit_id" name="roles" size="2" multiple>
+                                            <th:block th:each="permit, stat : ${permits}">
+                                                <option th:id="${'permit_'+stat.index}" th:value="${permit}" th:text="${permit}">PERMIT</option>
+                                            </th:block>
+                                        </select>
+                                    </div>
+                                    <div class="col" align="center">
+                                        <button type="submit" form="new_user" class="btn btn-success">Add new user</button>
+                                    </div>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </th:block>
+
+<div class="modal fade" p-2 id="modal_edit_id" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="modal_caption">Edit user</h5>
+                <button type="button" class="close" data-dismiss="modal">
+                    <span>&times;</span>
+                </button>
+            </div>
+            <div class="modal-body ml-5 mr-5">
+                <form id="form_edit_id" class="text-center ml-5 mr-5">
+                    <input id="csrf" type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}"/>
+                    <div th:replace="frag::user_parameter('id', modal_id, 'text', 'ID', 'true')"></div>
+                    <div th:replace="frag::common_parameters_block(modal_firstName, modal_lastName, modal_age, modal_email)"></div>
+                    <div th:replace="frag::user_parameter('password', modal_password, 'password', 'Password', 'false')"></div>
+                    <div class="form-group">
+                        <label class="font-weight-bold m-0" for="modal_role_id">Role</label>
+                        <select class="custom-select form-control" id="modal_role_id" size="2" name="roles" multiple>
+                            <!--/* <option value="1">ADMIN</option> */-->
+                        </select>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                <button type="submit" id="modal_submit" formaction="/admin/update" form="form_edit_id" class="btn btn-primary">Edit</button>
+            </div>
+        </div>
+    </div>
+</div>
+</div>
+</body>
+
+<th:block th:replace="admin_script::script"></th:block>
+
+</html>
+
