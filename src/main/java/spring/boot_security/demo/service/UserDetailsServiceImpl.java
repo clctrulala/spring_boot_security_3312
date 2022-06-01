@@ -60,6 +60,8 @@ public class UserDetailsServiceImpl implements UserDetailsService, UserService {
 
         if (password.isEmpty() || password.get().isEmpty()) {
             user.setPassword(oldUser.getPassword());
+        } else {
+            user.setPassword(passwordEncoder.encode(user.getPassword()));
         }
         if(null == user.getRoles() || 0 == user.getRoles().size()) {
             user.setRoles(oldUser.getRoles());
