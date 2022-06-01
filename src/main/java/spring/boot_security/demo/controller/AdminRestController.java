@@ -41,7 +41,7 @@ public class AdminRestController {
     }
 
     @PutMapping(value = "update", consumes = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity updateUser(@RequestBody Optional<User> user) {
+    public ResponseEntity<User> updateUser(@RequestBody Optional<User> user) {
         if(user.isEmpty()){
             return new ResponseEntity<>(HttpStatus.NO_CONTENT);
         }
@@ -49,7 +49,7 @@ public class AdminRestController {
     }
 
     @DeleteMapping(value = "delete", consumes = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity removeUser(@RequestBody Optional<User> user) {
+    public ResponseEntity<User> removeUser(@RequestBody Optional<User> user) {
         if(user.isEmpty() || null == user.get().getId()){
             return new ResponseEntity<>(HttpStatus.NO_CONTENT);
         }
@@ -58,7 +58,7 @@ public class AdminRestController {
     }
 
     @DeleteMapping(value = "delete/{id}", consumes = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity removeUserById(@PathVariable Optional<Long> id) {
+    public ResponseEntity<User> removeUserById(@PathVariable Optional<Long> id) {
         if(id.isEmpty()){
             return new ResponseEntity<>(HttpStatus.NO_CONTENT);
         }
