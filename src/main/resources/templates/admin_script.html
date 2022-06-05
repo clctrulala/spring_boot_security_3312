@@ -3,29 +3,16 @@
 <script type="application/javascript">
 function validateField(id, value){
 	if(!value){ return true }
-	if('firstName'===id || 'lastName'===id){
-		return (/^[\p{Alpha}]+-*[\p{Alpha}]+-*[\p{Alpha}]+$/u).test(''+value)
-	}
-	if('age'===id){
-		return value>0 && value<127
-	}
-	if('email'===id){
-		return (/^\p{Alpha}+\p{Nd}*@\p{Alpha}+\p{Nd}*\.\p{Alpha}{2,5}$/u).test(''+value)
+	switch(id){
+	    case 'firstName':
+	    case 'lastName':
+		    return (/^[\p{Alpha}]+-*[\p{Alpha}]+-*[\p{Alpha}]+$/u).test(''+value)
+	    case 'age': return value>0 && value<127
+	    case 'email':
+		    return (/^\p{Alpha}+\p{Nd}*@\p{Alpha}+\p{Nd}*\.\p{Alpha}{2,5}$/u).test(''+value)
+	    case 'password': return (/.+/u).test(''+value)
 	}
 }
-
-['firstName', 'lastName', 'age', 'email'].forEach(id=>{
-	$('#'+id).on('blur', e=>{
-		const field = $(e.currentTarget)
-		const id = field.attr('id')
-
-		if(validateField(id, field.val())){
-			$('#'+id).removeClass('custom-btn-class')
-		} else {
-			$('#'+id).addClass('custom-btn-class')
-		}
-	})
-})
 
 function copyRoles(dest, prefix){
     let count = 0;
@@ -37,19 +24,19 @@ function copyRoles(dest, prefix){
 		dest.append( new Option(text, text) )
 	}
 }
-
-function getRoles(prefix){
+/*
+function getRoles(id_prefix){
     let count = 0
 	let roles = ''
 
-    for( let role = $(prefix + count);
+    for( let role = $(id_prefix + count);
 			 role.text() && count<10000;
-			 role = $(prefix + ++count) ){
+			 role = $(id_prefix + ++count) ){
 		roles += ' ' + role.text().trim()
 	}
 	return roles.trim()
 }
-
+*/
 function changeFormState(button_obj, password_obj, group, button_attributes
                         ,button_text, hide_password, disable_fields, dest, prefix){
     button_obj.attr(button_attributes)
@@ -67,52 +54,9 @@ function hideFormState(button_obj, password_obj, group, button_attributes, butto
     changeFormState(button_obj, password_obj, group, button_attributes, button_text, true, true, dest, prefix)
 }
 
-function addButton(user_id, is_danger_type){
-	const btype = {class_type: is_danger_type ? 'btn-danger': 'btn-info'
-					  ,name: is_danger_type ? 'Delete': 'Edit'}
-	const str = `<td><button type="button" id="${btype.name.toLowerCase()}_${user_id}" value="${user_id}"
-	                class="btn ${btype.class_type}" data-toggle="modal"
-	                data-target="#modal_edit_id">${btype.name}</button></td>`
-
-	return str
-};
-
-function addCell(field_name, user_id, cell_text, is_header){
-	const cell_type = is_header ? 'th' : 'td'
-	const str = `<${cell_type} id="${field_name}_${user_id}">${cell_text}</${cell_type}>`
-
-	return str
-};
-
-function addRow(user){
-	let roles = ''
-	let row = ''
-	const btn_edit = addButton(user.id)
-	const btn_delete = addButton(user.id, true)
-
-	user.roles.forEach((role, i)=>{
-		roles += `<label class="pl-2" id="role_${+user.id}_${i}">${role}</label>`
-	})
-
-	const cells = [
-                    ['id', user.id, user.id, true]
-                   ,['firstName', user.id, user.firstName]
-                   ,['lastName', user.id, user.lastName]
-                   ,['age', user.id, user.age]
-                   ,['email', user.id, user.email]
-                   ,['roles', user.id, roles]
-                  ]
-
-	cells.forEach((cell)=>{
-		row += addCell(cell[0], cell[1], cell[2], cell[3])
-	})
-
-	return `<tr id="row_${user.id}">` + row + btn_edit + btn_delete + '</tr>'
-};
-
 function changeRow(user){
 	user.password = ''
-	return addRow(user)
+	return makeRow(user, true)
 }
 
 $("#new_user").submit(function(e) {
@@ -135,24 +79,21 @@ $("#new_user").submit(function(e) {
                             ,headers: def_headers
                                ,body: data_json
 			   }).then(response => {
-					if(!response.ok){
-						throw new Error("ERROR: Bad request for NEW user.")
-					}
+					if(!response.ok){ throw new Error("ERROR: Bad request for NEW user.") }
 					return response.json()
                }).then(user => {
-                    user.roles.forEach((item, index, array)=>{
-                        array[index]=item.name
-                    })
-                    $('#user_list').append(addRow(user))
+                    $('#user_list').append(makeRow(user, true))
                     return user
 			   }).catch(err=>console.log(err.message));
 
-    ['firstName'
-    ,'lastName'
-    ,'age'
-    ,'email'
-    ,'add_password'
-    ].forEach(item => $(`#${item}`).val(null))
+    const tmp = ['firstName'
+                ,'lastName'
+                ,'age'
+                ,'email'
+                ,'add_password'
+                ]
+
+    tmp.forEach(item => $(`#${item}`).val(null))
     $('#permit_id').val(null)
     $('#tab_profile').tab('show')
 })
@@ -179,23 +120,15 @@ $("#form_edit_id").submit(function(e) {
                             ,headers: def_headers
                                ,body: data_json
 			   }).then(response=>{
-					if(!response.ok){
-						throw new Error("ERROR: Request for DELETE \ EDIT user not sending")
-					}
+					if(!response.ok){ throw new Error("ERROR: Request for DELETE \ EDIT user not sending") }
 					if(method === 'PUT'){ return response.json() }
-			   }).then((response)=>{
+			   }).then((user)=>{
 			        if(method === 'PUT'){
-			            let user = response
-                        console.log(user)
-			            user.roles.forEach((item, index, array)=>{
-			                array[index]=item.name
-                        })
-			            console.log(user.roles)
-                        $(`#row_${form_data.get('id')}`).replaceWith(changeRow(user))
+                        $(`#row_${user.id}`).replaceWith(changeRow(user))
 			        } else {
 			            $(`#row_${form_data.get('id')}`).remove()
 			        }
-			   }).catch(err=>console.log(err.message));
+			   }).catch(err => console.log(err.message));
    $(form).parents('.modal').modal('hide')
 });
 
@@ -217,10 +150,10 @@ $('#modal_edit_id').on('show.bs.modal', function (event) {
                          ,`#${modal_prefix}${names[5]}`
                          ,'#modal_role_id'
                          ]
-    const btn_style_delete = {formaction : `/api/delete/`
+    const btn_style_delete = {formaction : '/api/delete/' + btn_value
 						          ,class : 'btn btn-danger'
 						      ,formmethod: 'DELETE'}
-    const btn_style_edit = {formaction : `/api/update`
+    const btn_style_edit = {formaction : '/api/update'
 						        ,class : 'btn btn-primary'
 						    ,formmethod: 'PUT'
 						    }
@@ -243,6 +176,63 @@ $('#modal_edit_id').on('show.bs.modal', function (event) {
 
         if(source && dest) { dest.attr( 'value', source.text() ) };
     }
+})
+
+$(document).ready(()=>{
+    const user_url = `/api/user`
+    const user_list_url= '/api/list'
+    const permits_url= '/api/permits'
+    const def_headers = {'Accept': 'application/json'
+                  ,'Content-Type': 'application/json; charset=utf-8'
+                  ,'X-CSRF-TOKEN': $('#csrf').attr('value')
+                        }
+    fetch( user_url, {method: "GET"
+           ,headers: def_headers
+    }).then(response=>{
+        if(!response.ok){ throw new Error("ERROR: Current user not found") }
+        return response.json()
+    }).then(user=>{
+        setPageHeader(user)
+    }).catch(err=>console.log(err.message));
+
+    fetch( user_list_url, {method: "GET"
+           ,headers: def_headers
+    }).then(response=>{
+        if(!response.ok){ throw new Error("ERROR: User list not fetched") }
+        return response.json()
+    }).then(list=>{
+        const user_list = $('#user_list')
+
+        list.forEach(user=>{
+            user_list.append(makeRow(user, true))
+        })
+    }).catch(err=>console.log(err.message));
+
+    fetch( permits_url, {method: "GET"
+           ,headers: def_headers
+    }).then(response=>{
+        if(!response.ok){ throw new Error("ERROR: Permits not fetched") }
+        return response.json()
+    }).then(permits=>{
+        permits.forEach((permit, index)=>{
+            $('#permit_id').append(`<option id="${'permit_' + index}" value="${permit.name}">${permit.name}</option>`)
+        })
+    }).catch(err=>console.log(err.message));
+
+    const fields = ['firstName', 'lastName', 'age', 'email', 'password']
+
+    fields.forEach(id=>{
+        $('#'+id).on('blur', e=>{
+            const field = $(e.currentTarget)
+            const id = field.attr('id')
+
+            if(validateField(id, field.val())){
+                $('#'+id).removeClass('custom-btn-class')
+            } else {
+                $('#'+id).addClass('custom-btn-class')
+            }
+        })
+    })
 })
 </script>
 

@@ -1,0 +1,22 @@
+<th:block th:fragment="script">
+<script type="application/javascript">
+$(document).ready(()=>{
+    const url = `/api/user`
+    const def_headers = {'Accept': 'application/json'
+                  ,'Content-Type': 'application/json; charset=utf-8'
+                  ,'X-CSRF-TOKEN': $('#csrf').attr('value')
+                        }
+    fetch( url, {method: "GET"
+               ,headers: def_headers
+        }).then(response=>{
+            if(!response.ok){
+                throw new Error("ERROR: Current user not found")
+            }
+            return response.json()
+        }).then(user=>{
+            setPageHeader(user)
+            $('#user_list').append(makeRow(user))
+        }).catch(err=>console.log(err.message));
+})
+</script>
+</th:block>

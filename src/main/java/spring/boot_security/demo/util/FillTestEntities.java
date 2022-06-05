@@ -22,9 +22,9 @@ public class FillTestEntities implements ApplicationRunner {
 
         @Override
         public void run(ApplicationArguments args) {
-            userDao.save( new User("Jhon","Connor", (byte)16, "jhon@example.com", encoder.encode("t1000"), Set.of(Role.ADMIN).stream().map(Role::new).collect(Collectors.toSet())));
-            userDao.save( new User("Sara", "Connor", (byte)24, "sara@example.com", encoder.encode("t800"),  Set.of(Role.USER, Role.ADMIN).stream().map(Role::new).collect(Collectors.toSet())));
-            userDao.save( new User("user", "resu", (byte)21, "user@mail.ru", encoder.encode("user"),  Set.of(Role.USER).stream().map(Role::new).collect(Collectors.toSet())));
-            userDao.save( new User("admin", "nimda", (byte)21,"admin@mail.ru", encoder.encode("admin"),  Set.of(Role.USER, Role.ADMIN).stream().map(Role::new).collect(Collectors.toSet())));
+            userDao.save( new User("Jhon","Connor", (byte)16, "jhon@example.com", encoder.encode("t1000"), Set.of("ADMIN").stream().map(Role::new).collect(Collectors.toSet())));
+            userDao.save( new User("Sara", "Connor", (byte)24, "sara@example.com", encoder.encode("t800"),  Set.of("USER", "ADMIN").stream().map(Role::new).collect(Collectors.toSet())));
+            userDao.save( new User("user", "resu", (byte)21, "user@mail.ru", encoder.encode("user"),  Set.of("USER").stream().map(Role::new).collect(Collectors.toSet())));
+            userDao.save( new User("admin", "nimda", (byte)21,"admin@mail.ru", encoder.encode("admin"),  Set.of("USER", "ADMIN").stream().map(Role::new).collect(Collectors.toSet())));
         }
 }

@@ -7,7 +7,7 @@
 
 <div class="row bg-dark" th:fragment="page_header">
   <div class="col align-self-end text-light">
-    <label><b th:text="${current_user.email}">name@mail.com</b></label> with roles:<th:block th:each="role : ${current_user.roles}"><label class="pl-1" th:text="${role.name}">HUY</label></th:block>
+    <label id="page_header_email"></label> <label id="page_header_roles">with roles:</label>
   </div>
   <div class="col-auto">
     <a class="btn btn-dark rounded-0 text-white-50" href="/logout">Logout</a>

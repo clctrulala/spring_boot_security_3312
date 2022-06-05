@@ -5,6 +5,7 @@ import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
 import javax.persistence.*;
+import javax.validation.constraints.*;
 import java.util.Collection;
 import java.util.Set;
 
@@ -16,16 +17,23 @@ public class User implements UserDetails {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(name = "first_name")
+    @Column(name = "first_name", nullable = false)
+    @Size(min = 3, max = 100)
+    @NotBlank
     private String firstName;
 
-    @Column(name = "last_name")
+    @Column(name = "last_name", nullable = false)
+    @Size(min = 3, max = 100)
+    @NotBlank
     private String lastName;
 
-    @Column
+    @Column(nullable = false)
+    @Positive
     private byte age;
 
     @Column(unique = true)
+    @Size(min = 7, max = 100)
+    @Email
     private String email;
 
     @Column(nullable = false)
@@ -33,7 +41,8 @@ public class User implements UserDetails {
 
     @OneToMany(cascade = CascadeType.ALL)
     @Column(nullable = false)
-    Set<Role> roles;
+    @NotEmpty
+    private Set<Role> roles;
 
     public User() {}
 

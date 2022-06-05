@@ -81,9 +81,9 @@
                                     <div class="form-group">
                                         <label class="font-weight-bold m-0" for="permit_id">Role</label>
                                         <select class="custom-select" id="permit_id" name="roles" size="2" multiple>
-                                            <th:block th:each="permit, stat : ${permits}">
-                                                <option th:id="${'permit_'+stat.index}" th:value="${permit}" th:text="${permit}">PERMIT</option>
-                                            </th:block>
+<!--                                            <th:block th:each="permit, stat : ${permits}">-->
+<!--                                                <option th:id="${'permit_'+stat.index}" th:value="${permit}" th:text="${permit}">PERMIT</option>-->
+<!--                                            </th:block>-->
                                         </select>
                                     </div>
                                     <div class="col" align="center">
@@ -130,8 +130,7 @@
 </div>
 </div>
 </body>
-
+<th:block th:replace="util::script"></th:block>
 <th:block th:replace="admin_script::script"></th:block>
-
 </html>
 

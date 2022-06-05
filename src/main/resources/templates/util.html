@@ -1,0 +1,49 @@
+<th:block th:fragment="script">
+    <script type="application/javascript">
+function makeButton(user_id, is_danger_type){
+	const btype = {class_type: is_danger_type ? 'btn-danger': 'btn-info'
+					  ,name: is_danger_type ? 'Delete': 'Edit'}
+	return `<td><button type="button" id="${btype.name.toLowerCase()}_${user_id}" value="${user_id}"
+	                class="btn ${btype.class_type}" data-toggle="modal"
+	                data-target="#modal_edit_id">${btype.name}</button></td>`
+};
+
+function makeCell(field_name, user_id, cell_text, is_header){
+	const cell_type = is_header ? 'th' : 'td'
+	return `<${cell_type} id="${field_name}_${user_id}">${cell_text}</${cell_type}>`
+}
+
+function makeRow(user, is_admin){
+	let row = ''
+    let roles = ''
+
+    user.roles.forEach((role, index)=>{
+		roles += ` <label id="role_${+user.id}_${index}">${role.name}</label>`
+	})
+
+	const cells = [ ['id', user.id, user.id, true]
+                   ,['firstName', user.id, user.firstName]
+                   ,['lastName', user.id, user.lastName]
+                   ,['age', user.id, user.age]
+                   ,['email', user.id, user.email]
+                   ,['roles', user.id, roles.trim()]
+                  ]
+
+    cells.forEach(cell=>{
+        row += makeCell(cell[0], cell[1], cell[2], cell[3])
+    })
+    row += is_admin ? makeButton(user.id) + makeButton(user.id, true) : ''
+	return `<tr id="row_${user.id}">` + row + '</tr>'
+}
+
+function setPageHeader(user){
+    const head_email = $('#page_header_email')
+    const head_roles = $('#page_header_roles')
+
+    head_email.append(`<b>${user.email}</b>`)
+    user.roles.forEach(role=>{
+        head_roles.after(` <label>${role.name}</label>`)
+    })
+}
+</script>
+</th:block>

@@ -1,19 +1,14 @@
 package spring.boot_security.demo.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import org.springframework.security.core.GrantedAuthority;
 
 import javax.persistence.*;
-import java.util.Set;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 @Entity
 @Table
 public class Role implements GrantedAuthority {
-    public static final String USER = "USER";
-    public static final String ADMIN = "ADMIN";
-
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
@@ -40,25 +35,17 @@ public class Role implements GrantedAuthority {
         this.name = name;
     }
 
-    @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
-    public static Set<Role> getAllRoles() { return Stream.of(ADMIN, USER).map(Role::new).collect(Collectors.toSet()); }
-
     @Override
-    @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
+    @JsonIgnore
     public String getAuthority() {
         return this.name;
-    }
-
-    @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
-    public GrantedAuthority giveAuthority() {
-        return this;
     }
 
     public boolean equals(Object obj) {
         if (this == obj) {
             return true;
         }
-        if (null != obj && obj instanceof GrantedAuthority) {
+        if (obj instanceof GrantedAuthority) {
             return ((GrantedAuthority)obj).getAuthority().equals(name);
         }
         return false;

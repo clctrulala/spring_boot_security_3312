@@ -7,7 +7,7 @@
   <title>User page</title>
 </head>
 <body>
-<div class="container-fluid" th:fragment="admin_panel_header">
+<div class="container-fluid">
   <th:block th:replace="frag::page_header"></th:block>
 
   <th:block>
@@ -40,11 +40,7 @@
                       <th:block th:replace="frag::users_list_headers"></th:block>
                     </tr>
                   </thead>
-                  <tbody>
-                    <tr th:each="user : ${users}">
-                      <th:block th:replace="frag::users_list_block"></th:block>
-                    </tr>
-                  </tbody>
+                  <tbody id="user_list"></tbody>
                 </table>
               </div>
             </div>
@@ -56,5 +52,7 @@
   </th:block>
 </div>
 </body>
+<th:block th:replace="util::script"></th:block>
+<th:block th:replace="user_script::script"></th:block>
 </html>
 

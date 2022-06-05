@@ -1,4 +1,4 @@
-package spring.boot_security.demo.security;
+package spring.boot_security.demo.util;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.stereotype.Component;
