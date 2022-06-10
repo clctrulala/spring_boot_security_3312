@@ -15,16 +15,16 @@ import java.util.stream.Collectors;
 @Component
 public class FillTestEntities implements ApplicationRunner {
 
-        @Autowired
-        private UserDao userDao;
-        @Autowired
-        private PasswordEncoder encoder;
+    @Autowired
+    private UserDao userDao;
+    @Autowired
+    private PasswordEncoder encoder;
 
-        @Override
-        public void run(ApplicationArguments args) {
-            userDao.save( new User("Jhon","Connor", (byte)16, "jhon@example.com", encoder.encode("t1000"), Set.of("ADMIN").stream().map(Role::new).collect(Collectors.toSet())));
-            userDao.save( new User("Sara", "Connor", (byte)24, "sara@example.com", encoder.encode("t800"),  Set.of("USER", "ADMIN").stream().map(Role::new).collect(Collectors.toSet())));
-            userDao.save( new User("user", "resu", (byte)21, "user@mail.ru", encoder.encode("user"),  Set.of("USER").stream().map(Role::new).collect(Collectors.toSet())));
-            userDao.save( new User("admin", "nimda", (byte)21,"admin@mail.ru", encoder.encode("admin"),  Set.of("USER", "ADMIN").stream().map(Role::new).collect(Collectors.toSet())));
-        }
+    @Override
+    public void run(ApplicationArguments args) {
+        userDao.save( new User("Jhon","Connor", (byte)16, "jhon@example.com", encoder.encode("t1000"), Set.of(new Role("ADMIN"))));
+        userDao.save( new User("Sara", "Connor", (byte)24, "sara@example.com", encoder.encode("t800"),  Set.of(new Role("ADMIN"), new Role("USER"))));
+        userDao.save( new User("user", "resu", (byte)21, "user@mail.ru", encoder.encode("user"),  Set.of(new Role("USER"))));
+        userDao.save( new User("admin", "nimda", (byte)21,"admin@mail.ru", encoder.encode("admin"),  Set.of(new Role("ADMIN"), new Role("USER"))));
+    }
 }

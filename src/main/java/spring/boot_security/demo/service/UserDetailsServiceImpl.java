@@ -68,12 +68,12 @@ public class UserDetailsServiceImpl implements UserDetailsService, UserService {
     public User updateUser(User user) {
         User oldUser = getUser(user.getId());
 
-        if (user.getPassword().isEmpty()) {
+        if(user.getPassword().isEmpty()) {
             user.setPassword(oldUser.getPassword());
         } else {
             user.setPassword(passwordEncoder.encode(user.getPassword()));
         }
-        if(0 == user.getRoles().size()) {
+        if(user.getRoles().isEmpty()) {
             user.setRoles(oldUser.getRoles());
         }
         return userDao.save(user);

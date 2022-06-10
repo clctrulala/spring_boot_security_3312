@@ -50,7 +50,7 @@ public class AdminRestController {
         }
     }
 
-    @DeleteMapping(value = "delete/{id}", consumes = MediaType.APPLICATION_JSON_VALUE, params = "id!=")
+    @DeleteMapping(value = "delete/{id}", consumes = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<HttpStatus> removeUserById(@PathVariable Long id) {
         try {
             userService.deleteUser(id);
