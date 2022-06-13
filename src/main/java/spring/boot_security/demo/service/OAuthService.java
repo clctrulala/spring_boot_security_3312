@@ -1,8 +1,6 @@
 package spring.boot_security.demo.service;
 
 import lombok.AllArgsConstructor;
-import org.apache.juli.logging.Log;
-import org.apache.juli.logging.LogFactory;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContext;

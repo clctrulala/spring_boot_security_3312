@@ -1,7 +1,5 @@
 package spring.boot_security.demo.security;
 
-import org.apache.juli.logging.Log;
-import org.apache.juli.logging.LogFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.PropertySource;
 import org.springframework.http.HttpHeaders;
@@ -22,8 +20,6 @@ import java.util.StringJoiner;
 @Component
 @PropertySource("classpath:application.properties")
 public class OAuthGoogle {
-    private final Log logger = LogFactory.getLog(getClass());
-
     public static String PROMPT_CONSENT = "consent";
     public static String PROMPT_NONE = "none";
     public static String PROMPT_SELECT_ACCOUNT = "select_account";
@@ -31,7 +27,6 @@ public class OAuthGoogle {
     public static String SCOPE_EMAIL = "https://www.googleapis.com/auth/userinfo.email";
     public static String SCOPE_OPENID = "openid";
     public static String SCOPE_AGERANGE = "https://www.googleapis.com/auth/profile.agerange.read";
-
     private static String googleTokenUrl = "https://oauth2.googleapis.com/token";
     private static String googleAuthorizationUrl = "https://accounts.google.com/o/oauth2/v2/auth";
 
@@ -60,7 +55,6 @@ public class OAuthGoogle {
     public OAuthGoogle setScope(Set<String> scope) {
         this.scope = scope.stream()
                 .reduce("", (old, current) -> old + " " + current);
-        logger.info("Scope: " + this.scope);
         return this;
     }
 
@@ -103,7 +97,6 @@ public class OAuthGoogle {
         if(null == clientId) {
             throw new OAuthAuthorizationException("OAuth redirect error: empty client_id.");
         }
-        logger.info("redirect:" + googleAuthorizationUrl + "?" + parameters);
         return "redirect:" + googleAuthorizationUrl + "?" + parameters;
     }
 
@@ -130,8 +123,6 @@ public class OAuthGoogle {
 
         GoogleAccessTokenResponse access = template.postForObject(googleTokenUrl, request, GoogleAccessTokenResponse.class);
         accessToken = access.getAccessToken();
-
-        logger.info(access.toString());
     }
 
     public String getAccessToken() {
