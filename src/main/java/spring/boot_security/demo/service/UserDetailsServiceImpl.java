@@ -1,6 +1,11 @@
 package spring.boot_security.demo.service;
 
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.AllArgsConstructor;
+import lombok.NoArgsConstructor;
+import org.apache.juli.logging.Log;
+import org.apache.juli.logging.LogFactory;
+import org.springframework.security.authentication.AuthenticationProvider;
+import org.springframework.security.core.Authentication;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
@@ -11,22 +16,20 @@ import spring.boot_security.demo.model.Role;
 import spring.boot_security.demo.model.User;
 import spring.boot_security.demo.repository.RoleDao;
 import spring.boot_security.demo.repository.UserDao;
+import spring.boot_security.demo.security.OAuthGoogle;
 
 import java.util.List;
 import java.util.Set;
 
 @Service
+@AllArgsConstructor
 public class UserDetailsServiceImpl implements UserDetailsService, UserService {
+    private final Log logger = LogFactory.getLog(getClass());
     private final UserDao userDao;
     private final PasswordEncoder passwordEncoder;
     private final RoleDao roleDao;
-
-    @Autowired
-    public UserDetailsServiceImpl(UserDao userDao, PasswordEncoder passwordEncoder, RoleDao roleDao) {
-        this.passwordEncoder = passwordEncoder;
-        this.userDao = userDao;
-        this.roleDao = roleDao;
-    }
+    private final GoogleAPI googleAPI;
+    private final OAuthGoogle oAuthGoogle;
 
     @Override
     @Transactional(readOnly = true)
