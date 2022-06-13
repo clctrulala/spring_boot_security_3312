@@ -23,7 +23,6 @@ import java.util.Set;
 public class GoogleAPI {
     private final OAuthGoogle oAuthGoogle;
     private static String googlePeopleAPIUrl = "https://people.googleapis.com/v1/people/me";
-    private final Log logger = LogFactory.getLog(getClass());
 
     public User getUser() {
         if(null == oAuthGoogle.getClientId()) {
@@ -38,7 +37,6 @@ public class GoogleAPI {
         RestTemplate template = new RestTemplate();
 
         header.setBearerAuth(oAuthGoogle.getAccessToken());
-        logger.info(oAuthGoogle.getAccessToken());
 
         RequestEntity<Void> resourceRequest = RequestEntity.get(url).headers(header).build();
         ResponseEntity<GoogleResource> response = template.exchange(resourceRequest, GoogleResource.class);
@@ -46,8 +44,6 @@ public class GoogleAPI {
         GoogleResource resource = response.getBody();
         GoogleResourceElementNames names = resource.getNames().get(0);
         GoogleResourceElementEmailAddress email = resource.getEmailAddresses().get(0);
-        User user = new User(names.getGivenName(), names.getFamilyName(), (byte)1, email.getValue(), names.getMetadata().getSource().getId(), Set.of(new Role("USER")));
-        logger.info(user);
-        return user;
+        return new User(names.getGivenName(), names.getFamilyName(), (byte)1, email.getValue(), names.getMetadata().getSource().getId(), Set.of(new Role("USER")));
     }
 }
