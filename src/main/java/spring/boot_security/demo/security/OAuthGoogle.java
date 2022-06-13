@@ -112,7 +112,9 @@ public class OAuthGoogle {
         tokenRequest.add("grant_type", "authorization_code");
         tokenRequest.add("code", code);
 
-        RequestEntity<MultiValueMap<String, String>> request = RequestEntity.post(googleTokenUrl).headers(header).body(tokenRequest);
+        RequestEntity<MultiValueMap<String, String>> request = RequestEntity.post(googleTokenUrl)
+                .headers(header)
+                .body(tokenRequest);
 
         if(null == clientId) {
             throw new OAuthAuthorizationException("OAuth authorization error: empty client_id.");
@@ -121,7 +123,8 @@ public class OAuthGoogle {
             throw new OAuthAuthorizationException("OAuth authorization error: empty client_secret.");
         }
 
-        GoogleAccessTokenResponse access = template.postForObject(googleTokenUrl, request, GoogleAccessTokenResponse.class);
+        GoogleAccessTokenResponse access = template.postForObject(googleTokenUrl,
+                request, GoogleAccessTokenResponse.class);
         accessToken = access.getAccessToken();
     }
 
